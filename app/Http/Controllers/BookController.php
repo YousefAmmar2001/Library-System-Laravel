@@ -138,6 +138,9 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         $deleted = $book->delete();
-        return response()->json([], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+        return response()->json([
+            'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
+            'icon' => $deleted ? 'success' : 'danger'
+        ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

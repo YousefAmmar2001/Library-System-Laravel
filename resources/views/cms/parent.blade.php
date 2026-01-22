@@ -176,7 +176,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <img src="{{ asset('cms/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Yousef Ammar</a>
+          <a href="#" class="d-block">{{ Auth()->user()->name }}</a>
         </div>
       </div>
 
@@ -293,6 +293,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
             </ul>
+          </li>
+
+          <li class="nav-header">Settings</li>
+
+          <li class="nav-item">
+            <a href="{{ route('cms.change-password') }}" class="nav-link">
+              <i class="nav-icon fas fa-lock"></i>
+              <p>Change Password</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="{{ route('cms.logout') }}" class="nav-link">
+              <i class="nav-icon fas fa-sign-out-alt"></i>
+              <p>Logout</p>
+            </a>
           </li>
         </ul>
       </nav>

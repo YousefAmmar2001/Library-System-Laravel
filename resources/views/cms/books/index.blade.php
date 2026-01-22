@@ -85,7 +85,7 @@
 @section('scripts')
 <script>
     function deleteBook(id, reference){
-            confirmDestroy('/cms/admin/books', id, reference)
-        }
+        confirmDestroy('/cms/admin/books', id, reference)
+    }
 </script>
 @endsection

@@ -31,8 +31,9 @@
                                 <select class="form-control categories" id="category_id" style="width: 100%;">
                                     {{-- <option selected="selected">Alabama</option> --}}
                                     @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" @if($category->id == $book->category_id)
-                                        selected @endif>{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" @if($category->id == $book->category_id) selected @endif>
+                                            {{ $category->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -60,8 +61,8 @@
                             </div>
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="visible" @if
-                                        ($book->is_visible) checked @endif>
+                                    <input type="checkbox" class="custom-control-input" id="visible"
+                                     @if ($book->is_visible) checked @endif>
                                     <label class="custom-control-label" for="visible">Visible</label>
                                 </div>
                             </div>
