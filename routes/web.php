@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use Facade\FlareClient\View;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +31,9 @@ Route::prefix('cms')->middleware('guest:admin,user')->group(function () {
 });
 
 Route::prefix('cms/admin')->middleware('auth:admin')->group(function () {
+    Route::resource('admins', AdminController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('countries', CountryController::class);
 });

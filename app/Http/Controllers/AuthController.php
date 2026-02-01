@@ -50,12 +50,12 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
+        $guard = auth('admin')->check() ? 'admin' : 'user';
         $validator = Validator($request->all(), [
-            'password' => 'required|string|password:admin',
+            'password' => "required|string|password:$guard",
             'new_password' => 'required|string|min:4|max:16|confirmed',
         ]);
         if (!$validator->fails()) {
-            $guard = auth('admin')->check() ? 'admin' : 'user';
             $user = auth($guard)->user();
             $user->password = Hash::make($request->get('new_password'));
             $isSaved = $user->save();

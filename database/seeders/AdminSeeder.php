@@ -19,6 +19,8 @@ class AdminSeeder extends Seeder
             'name' => 'Yousef Ammar',
             'email' => 'yousefbassamaliammar@gmail.com',
             'password' => Hash::make('12345678'),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

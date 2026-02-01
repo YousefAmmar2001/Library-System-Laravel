@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
 use Dotenv\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminController extends Controller
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +16,8 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $admins = Admin::where('id', '!=', auth('admin')->id())->get();
-        return response()->view('cms.admins.index', compact('admins'));
+        $roles = Role::all();
+        return response()->view('cms.roles.index', compact('roles'));
     }
 
     /**
@@ -28,7 +27,7 @@ class AdminController extends Controller
      */
     public function create()
     {
-        return response()->view('cms.admins.create');
+        return response()->view('cms.roles.create');
     }
 
     /**
@@ -40,21 +39,20 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $validator = Validator($request->all(), [
-            'name' => 'required|string|min:3|max:50',
-            'email' => 'required|string|email|unique:admins,email',
+            'name' => 'required|string|min:3|max:30',
+            'guard' => 'required|string|in:admin,user',
         ]);
-        if (!$validator->fails()) {
-            $admin = new Admin();
-            $admin->name = $request->get('name');
-            $admin->email = $request->get('email');
-            $admin->password = Hash::make(12345);
-            $isSaved = $admin->save();
+        if (! $validator->fails()) {
+            $role = new Role();
+            $role->name = $request->get('name');
+            $role->guard_name = $request->get('guard');
+            $isSaved = $role->save();
             return response()->json([
-                'message' => $isSaved ? 'Admin saved successfully' : 'Failed to save admin'
+                'message' => $isSaved ? 'Saved Successfully' : 'Failed to save'
             ], $isSaved ? Response::HTTP_CREATED : Response::HTTP_BAD_REQUEST);
         } else {
             return response()->json([
-                'message' => $validator->getMessageBag()->first()
+                'message' => $validator->getMessageBag()->first(),
             ], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -62,10 +60,10 @@ class AdminController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Admin $admin)
+    public function show($id)
     {
         //
     }
@@ -73,33 +71,31 @@ class AdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Admin $admin)
+    public function edit(Role $role)
     {
-        return response()->view('cms.admins.edit', compact('admin'));
+        return response()->view('cms.roles.edit', compact('role'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Admin  $admin
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Admin $admin)
+    public function update(Request $request, Role $role)
     {
         $validator = Validator($request->all(), [
-            'name' => 'required|string|min:3|max:50',
-            'email' => 'required|string|email|unique:admins,email,' . $admin->id,
+            'name' => 'required|string|min:3|max:30',
         ]);
         if (!$validator->fails()) {
-            $admin->name = $request->get('name');
-            $admin->email = $request->get('email');
-            $isSaved = $admin->save();
+            $role->name = $request->get('name');
+            $isSaved = $role->save();
             return response()->json([
-                'message' => $isSaved ? 'Admin updated successfully' : 'Failed to update admin'
+                'message' => $isSaved ? 'Role updated successfully' : 'Failed to update role'
             ], $isSaved ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
         } else {
             return response()->json([
@@ -111,15 +107,15 @@ class AdminController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Admin  $admin
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Admin $admin)
+    public function destroy(Role $role)
     {
-        $isDeleted = $admin->delete();
+        $deleted = $role->delete();
         return response()->json([
-            'title' => $isDeleted ? 'Admin deleted successfully' : 'Failed to delete Admin',
-            'icon' => $isDeleted ? 'success' : 'danger'
-        ], $isDeleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+            'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
+            'icon' => $deleted ? 'success' : 'danger'
+        ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }
