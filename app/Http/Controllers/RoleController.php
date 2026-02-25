@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Dotenv\Validator;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Role::class, 'role');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +21,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::withCount('permissions')->get();
         return response()->view('cms.roles.index', compact('roles'));
     }
 
@@ -63,7 +68,7 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Role $role)
     {
         //
     }
@@ -115,7 +120,7 @@ class RoleController extends Controller
         $deleted = $role->delete();
         return response()->json([
             'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
-            'icon' => $deleted ? 'success' : 'danger'
+            'icon' => $deleted ? 'success' : 'error'
         ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

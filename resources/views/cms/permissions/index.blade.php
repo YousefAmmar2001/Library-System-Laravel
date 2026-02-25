@@ -27,7 +27,9 @@
                                         <th>Guard</th>
                                         <th>Created at</th>
                                         <th>Updated at</th>
-                                        <th>Settings</th>
+                                        @canany(['Update-Permission', 'Delete-Permission'])
+                                            <th>Settings</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,18 +42,24 @@
                                             </td>
                                             <td>{{ $permission->created_at->format('Y-m-d h:ma') }}</td>
                                             <td>{{ $permission->updated_at->format('Y-m-d h:ma') }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="{{ route('permissions.edit', $permission->id) }}"
-                                                        class="btn btn-info">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a onclick="deletePermission({{ $permission->id }}, this)"
-                                                        class="btn btn-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
+                                            @canany(['Update-Permission', 'Delete-Permission'])
+                                                <td>
+                                                    <div class="btn-group">
+                                                        @can('Update-Permission')
+                                                            <a href="{{ route('permissions.edit', $permission->id) }}"
+                                                                class="btn btn-info">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('Delete-Permission')
+                                                            <a onclick="deletePermission({{ $permission->id }}, this)"
+                                                                class="btn btn-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
+                                                        @endcan
+                                                    </div>
+                                                </td>
+                                            @endcanany
                                         </tr>
                                     @endforeach
                                 </tbody>

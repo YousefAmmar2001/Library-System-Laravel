@@ -9,6 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CountryController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Country::class, 'country');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,7 +45,7 @@ class CountryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator($request->all(), [
-            'name' => 'required|string||min:3|max:30'
+            'name' => 'required|string|min:3|max:30'
         ]);
         if (!$validator->fails()) {
             $country = new Country();
@@ -113,7 +119,7 @@ class CountryController extends Controller
         $isDeleted = $country->delete();
         return response()->json([
             'title' => $isDeleted ? 'Deleted successfully' : 'Deleting failed',
-            'icon' => $isDeleted ? 'success' : 'danger'
+            'icon' => $isDeleted ? 'success' : 'error'
         ], $isDeleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

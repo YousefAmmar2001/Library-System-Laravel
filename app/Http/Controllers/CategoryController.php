@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Category::class, 'category');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,6 +20,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Category::class);
         $categories = Category::withCount('books')->get();
         return response()->view('cms.categories.index', ['categories' => $categories]);
         // return response()->view('cms.categories.index', compact('categories'));
@@ -26,6 +33,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        // $this->authorize('create', Category::class);
         return response()->view('cms.categories.create');
     }
 
@@ -37,6 +45,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // $this->authorize('create', Category::class);
         // dd($request->all());
 
         $request->validate([
@@ -78,6 +87,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        // $this->authorize('update', $category);
         return response()->view('cms.categories.edit', compact('category'));
     }
 
@@ -90,6 +100,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        // $this->authorize('update', $category);
         $request->validate([
             'name' => 'required|string|min:3|max:20',
             'description' => 'nullable|string|min:3|max:50',
@@ -113,6 +124,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        // $this->authorize('delete', $category);
         $deleted = $category->delete();
         if ($deleted) {
             return redirect()->back();

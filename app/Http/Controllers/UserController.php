@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
-class PermissionController extends Controller
+class UserController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->authorizeResource(Permission::class, 'permission');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -21,8 +16,8 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::all();
-        return response()->view('cms.permissions.index', compact('permissions'));
+        $users = User::withCount('permissions')->get();
+        return response()->view('cms.users.index', compact('users'));
     }
 
     /**
@@ -32,7 +27,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        return response()->view('cms.permissions.create');
+        return response()->view('cms.users.create');
     }
 
     /**
@@ -44,20 +39,21 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator($request->all(), [
-            'name' => 'required|string|min:3|max:30',
-            'guard' => 'required|string|in:admin,user',
+            'name' => 'required|string|min:3|max:50',
+            'email' => 'required|string|email|unique:users,email',
         ]);
         if (!$validator->fails()) {
-            $permission = new Permission();
-            $permission->name = $request->get('name');
-            $permission->guard_name = $request->get('guard');
-            $isSaved = $permission->save();
+            $user = new User();
+            $user->name = $request->get('name');
+            $user->email = $request->get('email');
+            $user->password = Hash::make(12345);
+            $isSaved = $user->save();
             return response()->json([
-                'message' => $isSaved ? 'Saved Successfully' : 'Failed to save'
+                'message' => $isSaved ? 'User saved successfully' : 'Failed to save user'
             ], $isSaved ? Response::HTTP_CREATED : Response::HTTP_BAD_REQUEST);
         } else {
             return response()->json([
-                'message' => $validator->getMessageBag()->first(),
+                'message' => $validator->getMessageBag()->first()
             ], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -65,10 +61,10 @@ class PermissionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(Permission $permission)
+    public function show(User $user)
     {
         //
     }
@@ -76,31 +72,33 @@ class PermissionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function edit(Permission $permission)
+    public function edit(User $user)
     {
-        return response()->view('cms.permissions.edit', compact('permission'));
+        return response()->view('cms.users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Permission $permission)
+    public function update(Request $request, User $user)
     {
         $validator = Validator($request->all(), [
-            'name' => 'required|string|min:3|max:30',
+            'name' => 'required|string|min:3|max:50',
+            'email' => 'required|string|email|unique:users,email,' . $user->id,
         ]);
         if (!$validator->fails()) {
-            $permission->name = $request->get('name');
-            $isSaved = $permission->save();
+            $user->name = $request->get('name');
+            $user->email = $request->get('email');
+            $isSaved = $user->save();
             return response()->json([
-                'message' => $isSaved ? 'Permission updated successfully' : 'Failed to update permission'
+                'message' => $isSaved ? 'User updated successfully' : 'Failed to update user'
             ], $isSaved ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
         } else {
             return response()->json([
@@ -112,15 +110,15 @@ class PermissionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Permission $permission)
+    public function destroy(User $user)
     {
-        $deleted = $permission->delete();
+        $isDeleted = $user->delete();
         return response()->json([
-            'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
-            'icon' => $deleted ? 'success' : 'error'
-        ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+            'title' => $isDeleted ? 'User deleted successfully' : 'Failed to delete user',
+            'icon' => $isDeleted ? 'success' : 'error'
+        ], $isDeleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

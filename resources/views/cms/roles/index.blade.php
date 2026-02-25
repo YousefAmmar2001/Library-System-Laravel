@@ -25,9 +25,14 @@
                                         <th style="width: 10px">#</th>
                                         <th>Name</th>
                                         <th>Guard</th>
+                                        @can('Manage-Role-Permission')
+                                            <th>Permissions</th>
+                                        @endcan
                                         <th>Created at</th>
                                         <th>Updated at</th>
-                                        <th>Settings</th>
+                                        @canany(['Update-Role', 'Delete-Role'])
+                                            <th>Settings</th>
+                                        @endcanany
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,19 +43,33 @@
                                             <td>
                                                 <span class="badge bg-info">{{ $role->guard_name }}</span>
                                             </td>
+                                            @can('Manage-Role-Permission')
+                                                <td>
+                                                    <a href="{{ route('role.show', $role->id) }}"
+                                                        class="btn btn-block bg-gradient-info btn-sm">{{ $role->permissions_count }}
+                                                        Permission/s
+                                                    </a>
+                                                </td>
+                                            @endcan
                                             <td>{{ $role->created_at->format('Y-m-d h:ma') }}</td>
                                             <td>{{ $role->updated_at->format('Y-m-d h:ma') }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-info">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a onclick="deleteRole({{ $role->id }}, this)"
-                                                        class="btn btn-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
+                                            @canany(['Update-Role', 'Delete-Role'])
+                                                <td>
+                                                    <div class="btn-group">
+                                                        @can('Update-Role')
+                                                            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-info">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('Delete-Role')
+                                                            <a onclick="deleteRole({{ $role->id }}, this)"
+                                                                class="btn btn-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
+                                                        @endcan
+                                                    </div>
+                                                </td>
+                                            @endcanany
                                         </tr>
                                     @endforeach
                                 </tbody>
