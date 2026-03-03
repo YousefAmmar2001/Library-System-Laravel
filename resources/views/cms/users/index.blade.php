@@ -49,8 +49,8 @@
                                                     </a>
                                                 </td>
                                             @endcan
-                                            <td>{{ $user->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $user->updated_at->format('Y-m-d h:ma') }}</td>
+                                            <td>{{ $user->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $user->updated_at->format('Y-m-d h:ia') }}</td>
                                             @canany(['Update-User', 'Delete-User'])
                                                 <td>
                                                     <div class="btn-group">

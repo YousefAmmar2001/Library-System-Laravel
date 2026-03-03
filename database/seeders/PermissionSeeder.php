@@ -49,6 +49,7 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'Read-Books', 'guard_name' => 'admin']);
         Permission::create(['name' => 'Update-Book', 'guard_name' => 'admin']);
         Permission::create(['name' => 'Delete-Book', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'Restore-Book', 'guard_name' => 'admin']);
 
         Permission::create(['name' => 'Create-Country', 'guard_name' => 'admin']);
         Permission::create(['name' => 'Read-Countries', 'guard_name' => 'admin']);

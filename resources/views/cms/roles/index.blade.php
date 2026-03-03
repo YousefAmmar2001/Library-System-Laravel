@@ -51,8 +51,8 @@
                                                     </a>
                                                 </td>
                                             @endcan
-                                            <td>{{ $role->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $role->updated_at->format('Y-m-d h:ma') }}</td>
+                                            <td>{{ $role->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $role->updated_at->format('Y-m-d h:ia') }}</td>
                                             @canany(['Update-Role', 'Delete-Role'])
                                                 <td>
                                                     <div class="btn-group">

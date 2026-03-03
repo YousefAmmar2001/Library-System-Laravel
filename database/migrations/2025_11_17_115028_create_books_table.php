@@ -24,6 +24,7 @@ class CreateBooksTable extends Migration
             $table->foreignId('category_id');
             $table->foreign('category_id')->on('categories')->references('id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

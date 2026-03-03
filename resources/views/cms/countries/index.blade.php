@@ -36,8 +36,8 @@
                                         <tr>
                                             <td>{{ $country->id }}</td>
                                             <td>{{ $country->name }}</td>
-                                            <td>{{ $country->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $country->updated_at->format('Y-m-d h:ma') }}</td>
+                                            <td>{{ $country->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $country->updated_at->format('Y-m-d h:ia') }}</td>
                                             @canany(['Update-Country', 'Delete-Country'])
                                                 <td>
                                                     <div class="btn-group">

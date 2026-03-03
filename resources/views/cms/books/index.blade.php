@@ -31,7 +31,7 @@
                                         <th>Visible</th>
                                         <th>Created at</th>
                                         <th>Updated at</th>
-                                        @canany(['Update-Book', 'Delete-Book'])
+                                        @canany(['Update-Book', 'Delete-Book', 'Restore-Book'])
                                             <th>Settings</th>
                                         @endcanany
                                     </tr>
@@ -55,9 +55,9 @@
                                                 <span
                                                     class="badge @if ($book->is_visible) bg-success @else bg-danger @endif">{{ $book->is_visible ? 'True' : 'False' }}</span>
                                             </td>
-                                            <td>{{ $book->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $book->updated_at->format('Y-m-d h:ma') }}</td>
-                                            @canany(['Update-Book', 'Delete-Book'])
+                                            <td>{{ $book->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $book->updated_at->format('Y-m-d h:ia') }}</td>
+                                            @canany(['Update-Book', 'Delete-Book', 'Restore-Book'])
                                                 <td>
                                                     <div class="btn-group">
                                                         @can('Update-Book')
@@ -65,12 +65,21 @@
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                         @endcan
-                                                        @can('Delete-Book')
-                                                            <a onclick="deleteBook({{ $book->id }}, this)"
-                                                                class="btn btn-danger">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
-                                                        @endcan
+                                                        @if ($book->trashed())
+                                                            @can('Restore-Book')
+                                                                <a onclick="toggleBook({{ $book->id }}, this)"
+                                                                    class="btn btn-warning">
+                                                                    <i class="fas fa-trash-restore"></i>
+                                                                </a>
+                                                            @endcan
+                                                        @else
+                                                            @can('Delete-Book')
+                                                                <a onclick="toggleBook({{ $book->id }}, this)"
+                                                                    class="btn btn-danger">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </a>
+                                                            @endcan
+                                                        @endif
                                                     </div>
                                                 </td>
                                             @endcanany
@@ -94,8 +103,47 @@
 
 @section('scripts')
     <script>
-        function deleteBook(id, reference) {
-            confirmDestroy('/cms/admin/books', id, reference)
+        function toggleBook(id, reference) {
+
+            let isRestore = $(reference).hasClass('btn-warning');
+
+            let confirmText = isRestore ? "Yes, restore it!" : "Yes, delete it!";
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You can change the status later!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: confirmText
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let url = isRestore ? '/cms/admin/books/' + id + '/restore' : '/cms/admin/books/' + id;
+                    let method = isRestore ? 'put' : 'delete';
+
+                    axios({
+                        method: method,
+                        url: url
+                    }).then(function(response) {
+                        showMessage(response.data);
+
+                        let row = $(reference).closest('tr');
+
+                        row.find('td:eq(8)').text(response.data.updated_at);
+
+                        if (isRestore) {
+                            $(reference).removeClass('btn-warning').addClass('btn-danger')
+                                .find('i').removeClass('fas fa-trash-restore').addClass('fas fa-trash');
+                        } else {
+                            $(reference).removeClass('btn-danger').addClass('btn-warning')
+                                .find('i').removeClass('fas fa-trash').addClass('fas fa-trash-restore');
+                        }
+                    }).catch(function(error) {
+                        showMessage(error.response.data);
+                    });
+                }
+            });
         }
     </script>
 @endsection

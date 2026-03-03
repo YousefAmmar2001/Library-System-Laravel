@@ -40,8 +40,8 @@
                                             <td>
                                                 <span class="badge bg-info">{{ $permission->guard_name }}</span>
                                             </td>
-                                            <td>{{ $permission->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $permission->updated_at->format('Y-m-d h:ma') }}</td>
+                                            <td>{{ $permission->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $permission->updated_at->format('Y-m-d h:ia') }}</td>
                                             @canany(['Update-Permission', 'Delete-Permission'])
                                                 <td>
                                                     <div class="btn-group">

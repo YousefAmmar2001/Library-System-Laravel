@@ -45,6 +45,7 @@ Route::prefix('cms/admin')->middleware('auth:admin')->group(function () {
 Route::prefix('cms/admin')->middleware('auth:admin,user')->group(function () {
     Route::view('/', 'cms.empty')->name('home');
     Route::resource('categories', CategoryController::class);
+    Route::put('books/{id}/restore', [BookController::class, 'restore'])->name('books.restore');
     Route::resource('books', BookController::class);
     Route::resource('countries', CountryController::class);
     Route::get('change-password', [AuthController::class, 'showChangePassword'])->name('cms.change-password');

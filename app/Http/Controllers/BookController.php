@@ -22,7 +22,10 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with('category')->get();
+        $books = Book::with('category')->withTrashed()->get();
+        // $books = Book::with('category')->onlyTrashed()->get();
+        // $books = Book::with('category')->withoutTrashed()->get();
+        // $books = Book::with('category')->get();
         return response()->view('cms.books.index', compact('books'));
     }
 
@@ -145,7 +148,20 @@ class BookController extends Controller
         $deleted = $book->delete();
         return response()->json([
             'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
-            'icon' => $deleted ? 'success' : 'error'
+            'icon' => $deleted ? 'success' : 'error',
+            'updated_at' => $book->updated_at->format('Y-m-d h:mi')
         ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+    }
+
+    public function restore($id)
+    {
+        $book = Book::withTrashed()->findOrFail($id);
+        $this->authorize('restore', $book);
+        $restored = $book->restore();
+        return response()->json([
+            'title' => $restored ? 'Restored successfully' : 'Restoring failed',
+            'icon' => $restored ? 'success' : 'error',
+            'updated_at' => $book->updated_at->format('Y-m-d h:ia')
+        ], $restored ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

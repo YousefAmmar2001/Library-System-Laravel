@@ -83,9 +83,12 @@ class BookPolicy
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(Admin $admin, Book $book)
+    public function restore($user, Book $book)
     {
-        //
+        if (auth('user')->check()) return $this->deny();
+        return auth('admin')->user()->hasPermissionTo('Restore-Book', 'admin')
+            ? $this->allow()
+            : $this->deny();
     }
 
     /**

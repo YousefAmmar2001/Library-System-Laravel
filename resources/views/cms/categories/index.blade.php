@@ -45,8 +45,8 @@
                                                 <span
                                                     class="badge @if ($category->is_visible) bg-success @else bg-danger @endif">{{ $category->visibility_status }}</span>
                                             </td>
-                                            <td>{{ $category->created_at->format('Y-m-d h:ma') }}</td>
-                                            <td>{{ $category->updated_at->format('Y-m-d h:ma') }}</td>
+                                            <td>{{ $category->created_at->format('Y-m-d h:ia') }}</td>
+                                            <td>{{ $category->updated_at->format('Y-m-d h:ia') }}</td>
                                             @canany(['Update-Category', 'Delete-Category'])
                                                 <td>
                                                     <div class="btn-group">
