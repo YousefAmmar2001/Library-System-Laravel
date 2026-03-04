@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
@@ -20,7 +21,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', Category::class);
+        // $this->authorize('viewAny', Category::class);
         $categories = Category::withCount('books')->get();
         return response()->view('cms.categories.index', ['categories' => $categories]);
         // return response()->view('cms.categories.index', compact('categories'));
@@ -46,25 +47,25 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         // $this->authorize('create', Category::class);
-        // dd($request->all());
-
-        $request->validate([
+        $validator = Validator($request->all(), [
             'name' => 'required|string|min:3|max:20',
             'description' => 'nullable|string|min:3|max:50',
-            'visible' => 'in:on|string'
-        ], [
-            'name.required' => 'Please, enter category name'
+            'visible' => 'required|boolean'
         ]);
 
-        $category = new Category();
-        $category->name = $request->get('name');
-        $category->description = $request->get('description');
-        $category->is_visible = $request->has('visible');
-        $isSaved = $category->save();
-        if ($isSaved) {
-            // return redirect()->route('categories.index');
-            session()->flash('message', 'Category saved successfully');
-            return redirect()->back();
+        if (!$validator->fails()) {
+            $category = new Category();
+            $category->name = $request->get('name');
+            $category->description = $request->get('description');
+            $category->is_visible = $request->get('visible');
+            $isSaved = $category->save();
+            return response()->json([
+                'message' => $isSaved ? 'Category created successfully' : 'Failed to create category'
+            ], $isSaved ? Response::HTTP_CREATED : Response::HTTP_BAD_REQUEST);
+        } else {
+            return response()->json([
+                'message' => $validator->getMessageBag()->first(),
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -101,18 +102,23 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         // $this->authorize('update', $category);
-        $request->validate([
+        $validator = Validator($request->all(), [
             'name' => 'required|string|min:3|max:20',
             'description' => 'nullable|string|min:3|max:50',
-            'visible' => 'in:on|string'
+            'visible' => 'required|boolean'
         ]);
-
-        $category->name = $request->get('name');
-        $category->description = $request->get('description');
-        $category->is_visible = $request->has('visible');
-        $isSaved = $category->save();
-        if ($isSaved) {
-            return redirect()->route('categories.index');
+        if (!$validator->fails()) {
+            $category->name = $request->get('name');
+            $category->description = $request->get('description');
+            $category->is_visible = $request->get('visible');
+            $isSaved = $category->save();
+            return response()->json([
+                'message' => $isSaved ? 'Category updated successfully' : 'Failed to update category'
+            ], $isSaved ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+        } else {
+            return response()->json([
+                'message' => $validator->getMessageBag()->first()
+            ], Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -125,9 +131,17 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         // $this->authorize('delete', $category);
-        $deleted = $category->delete();
-        if ($deleted) {
-            return redirect()->back();
+        if ($category->books()->withTrashed()->exists()) {
+            return response()->json([
+                'title' => 'Wait! Cannot Delete',
+                'icon'  => 'warning',
+                'text'  => 'This category is linked to existing books. Please move or delete the books first.'
+            ], Response::HTTP_BAD_REQUEST);
         }
+        $isDeleted = $category->delete();
+        return response()->json([
+            'title' => $isDeleted ? 'Deleted successfully' : 'Deleting failed',
+            'icon' => $isDeleted ? 'success' : 'error'
+        ], $isDeleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

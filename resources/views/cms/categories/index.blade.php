@@ -57,14 +57,10 @@
                                                             </a>
                                                         @endcan
                                                         @can('Delete-Category')
-                                                            <form method="POST"
-                                                                action="{{ route('categories.destroy', $category->id) }}">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-danger">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
-                                                            </form>
+                                                            <a onclick="deleteCategory({{ $category->id }}, this)"
+                                                                class="btn btn-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
                                                         @endcan
                                                     </div>
                                                 </td>
@@ -88,5 +84,9 @@
 @endsection
 
 @section('scripts')
-
+    <script>
+        function deleteCategory(id, reference) {
+            confirmDestroy('/cms/admin/categories', id, reference)
+        }
+    </script>
 @endsection

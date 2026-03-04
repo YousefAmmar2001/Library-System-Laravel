@@ -29,8 +29,9 @@ function showMessage(data) {
     Swal.fire({
         icon: data.icon,
         title: data.title,
-        showConfirmButton: false,
-        timer: 1500
+        text: data.text,
+        showConfirmButton: data.icon !== 'success',
+        timer: data.icon === 'success' ? 1500 : undefined
     });
 }
 
