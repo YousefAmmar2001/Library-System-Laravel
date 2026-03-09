@@ -10,7 +10,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPermissionController;
-use Facade\FlareClient\View;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,9 +23,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::fallback(function () {
-//     return view('cms.404');
-// });
+Route::fallback(function () {
+    if (auth('admin')->check() || auth('user')->check()) {
+        return redirect()->route('home');
+    }
+    return response()->view('cms.404');
+});
 
 Route::prefix('cms')->middleware('guest:admin,user')->group(function () {
     Route::get('{guard}/login', [AuthController::class, 'showLogin'])->name('cms.login');
