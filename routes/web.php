@@ -23,15 +23,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::fallback(function () {
-    if (auth('admin')->check() || auth('user')->check()) {
-        return redirect()->route('home');
-    }
-    return response()->view('cms.404');
-});
-
 Route::prefix('cms')->middleware('guest:admin,user')->group(function () {
-    Route::get('{guard}/login', [AuthController::class, 'showLogin'])->name('cms.login');
+    Route::get('{guard}/login', [AuthController::class, 'showLogin'])->name('cms.login')->where('guard', 'admin|user');
     Route::post('login', [AuthController::class, 'login']);
 });
 
@@ -53,4 +46,11 @@ Route::prefix('cms/admin')->middleware('auth:admin,user')->group(function () {
     Route::get('change-password', [AuthController::class, 'showChangePassword'])->name('cms.change-password');
     Route::post('change-password', [AuthController::class, 'changePassword']);
     Route::get('logout', [AuthController::class, 'logout'])->name('cms.logout');
+});
+
+Route::fallback(function () {
+    if (auth('admin')->check() || auth('user')->check()) {
+        return redirect()->route('home');
+    }
+    return response()->view('cms.404');
 });

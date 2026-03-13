@@ -21,9 +21,6 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string|min:4|max:16',
             'remember' => 'required|boolean',
-            'guard' => 'required|string|in:admin,user'
-        ], [
-            'guard.in' => 'Please, check url'
         ]);
         $credentials = ['email' => $request->get('email'), 'password' => $request->get('password')];
         if (!$validator->fails()) {
@@ -74,6 +71,7 @@ class AuthController extends Controller
         $guard = auth('admin')->check() ? 'admin' : 'user';
         Auth::guard($guard)->logout();
         $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect()->route('cms.login', $guard);
     }
 }

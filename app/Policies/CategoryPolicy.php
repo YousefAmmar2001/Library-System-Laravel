@@ -18,7 +18,7 @@ class CategoryPolicy
     public function viewAny($user)
     {
         $guard = auth('admin')->check() ? 'admin' : 'user';
-        return auth($guard)->user()->hasPermissionTo('Read-Categories')
+        return auth($guard)->user()->hasPermissionTo('Read-Categories', $guard)
             ? $this->allow()
             : $this->deny();
     }

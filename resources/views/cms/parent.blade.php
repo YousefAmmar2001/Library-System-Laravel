@@ -188,7 +188,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">{{ Auth()->user()->name }}</a>
+                        <a href="#"
+                            class="d-block">{{ Auth('admin')->user()->name ?? Auth('user')->user()->name }}</a>
                     </div>
                 </div>
 
@@ -532,7 +533,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 {{ env('APP_VERSION') }}
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2024-{{ now()->year + 1 }} <a
+            <strong>Copyright &copy; 2026-{{ now()->year + 1 }} <a
                     href="https://adminlte.io">{{ env('APP_NAME') }}</a>.</strong> All rights reserved.
         </footer>
     </div>

@@ -18,7 +18,7 @@ class BookPolicy
     public function viewAny($user)
     {
         $guard = auth('admin')->check() ? 'admin' : 'user';
-        return auth($guard)->user()->hasPermissionTo('Read-Books')
+        return auth($guard)->user()->hasPermissionTo('Read-Books', $guard)
             ? $this->allow()
             : $this->deny();
     }

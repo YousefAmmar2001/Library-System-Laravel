@@ -18,7 +18,7 @@ class CountryPolicy
     public function viewAny($user)
     {
         $guard = auth('admin')->check() ? 'admin' : 'user';
-        return auth($guard)->user()->hasPermissionTo('Read-Countries')
+        return auth($guard)->user()->hasPermissionTo('Read-Countries', $guard)
             ? $this->allow()
             : $this->deny();
     }
