@@ -1,20 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use App\Models\Book;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class BookController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->authorizeResource(Book::class, 'book');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -22,26 +16,14 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with('category')->withTrashed()->get();
-        // $books = Book::with('category')->onlyTrashed()->get();
-        // $books = Book::with('category')->withoutTrashed()->get();
-        // $books = Book::with('category')->get();
-        if (auth('api')->check()) {
-            return response()->json(['data' => $books]);
-        } else {
-            return response()->view('cms.books.index', compact('books'));
-        }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $categories = Category::where('is_visible', true)->get();
-        return response()->view('cms.books.create', compact('categories'));
+        // $books = Book::all();
+        // $books = Book::paginate(2);
+        $books = Book::simplePaginate(3);
+        return response()->json([
+            'status' => true,
+            'message' => 'Success',
+            'data' => $books,
+        ]);
     }
 
     /**
@@ -84,31 +66,19 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Book  $book
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show($id)
     {
         //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Book  $book
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Book $book)
-    {
-        $categories = Category::where('is_visible', true)->get();
-        return response()->view('cms.books.edit', compact('book', 'categories'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Book  $book
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Book $book)
@@ -144,28 +114,15 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Book  $book
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Book $book)
     {
         $deleted = $book->delete();
         return response()->json([
-            'title' => $deleted ? 'Deleted successfully' : 'Deleting failed',
-            'icon' => $deleted ? 'success' : 'error',
-            'updated_at' => $book->updated_at->format('Y-m-d h:mi')
+            'message' => $deleted ? 'Deleted successfully' : 'Deleting failed',
+            'status' => $deleted,
         ], $deleted ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
-    }
-
-    public function restore($id)
-    {
-        $book = Book::withTrashed()->findOrFail($id);
-        $this->authorize('restore', $book);
-        $restored = $book->restore();
-        return response()->json([
-            'title' => $restored ? 'Restored successfully' : 'Restoring failed',
-            'icon' => $restored ? 'success' : 'error',
-            'updated_at' => $book->updated_at->format('Y-m-d h:ia')
-        ], $restored ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 }

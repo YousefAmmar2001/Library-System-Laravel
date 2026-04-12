@@ -17,7 +17,14 @@ class BookPolicy
      */
     public function viewAny($user)
     {
-        $guard = auth('admin')->check() ? 'admin' : 'user';
+        $guard = '';
+        if (auth('admin')->check()) {
+            $guard = 'admin';
+        } elseif (auth('user')->check()) {
+            $guard = 'user';
+        } elseif (auth('api')->check()) {
+            $guard = 'api';
+        }
         return auth($guard)->user()->hasPermissionTo('Read-Books', $guard)
             ? $this->allow()
             : $this->deny();
@@ -42,7 +49,7 @@ class BookPolicy
      */
     public function create($user)
     {
-        if (auth('user')->check()) return $this->deny();
+        if (auth('user')->check() || auth('api')->check()) return $this->deny();
         return auth('admin')->user()->hasPermissionTo('Create-Book', 'admin')
             ? $this->allow()
             : $this->deny();
@@ -56,7 +63,7 @@ class BookPolicy
      */
     public function update($user, Book $book)
     {
-        if (auth('user')->check()) return $this->deny();
+        if (auth('user')->check() || auth('api')->check()) return $this->deny();
         return auth('admin')->user()->hasPermissionTo('Update-Book', 'admin')
             ? $this->allow()
             : $this->deny();
@@ -70,7 +77,7 @@ class BookPolicy
      */
     public function delete($user, Book $book)
     {
-        if (auth('user')->check()) return $this->deny();
+        if (auth('user')->check() || auth('api')->check()) return $this->deny();
         return auth('admin')->user()->hasPermissionTo('Delete-Book', 'admin')
             ? $this->allow()
             : $this->deny();
@@ -85,7 +92,7 @@ class BookPolicy
      */
     public function restore($user, Book $book)
     {
-        if (auth('user')->check()) return $this->deny();
+        if (auth('user')->check() || auth('api')->check()) return $this->deny();
         return auth('admin')->user()->hasPermissionTo('Restore-Book', 'admin')
             ? $this->allow()
             : $this->deny();

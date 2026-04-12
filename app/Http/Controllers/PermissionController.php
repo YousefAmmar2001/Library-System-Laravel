@@ -45,7 +45,7 @@ class PermissionController extends Controller
     {
         $validator = Validator($request->all(), [
             'name' => 'required|string|min:3|max:30',
-            'guard' => 'required|string|in:admin,user',
+            'guard' => 'required|string|in:admin,user,api',
         ]);
         if (!$validator->fails()) {
             $permission = new Permission();

@@ -31,6 +31,7 @@
                                     <select class="form-control permissions" id="guard" style="width: 100%;">
                                         <option value="admin">Admin</option>
                                         <option value="user">User</option>
+                                        <option value="api">User API</option>
                                     </select>
                                 </div>
                                 <div class="form-group">

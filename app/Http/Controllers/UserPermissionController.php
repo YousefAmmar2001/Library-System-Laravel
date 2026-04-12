@@ -66,7 +66,7 @@ class UserPermissionController extends Controller
     public function show(User $user)
     {
         $this->authorize('update', UserPermissionPolicy::class);
-        $permissions = Permission::where('guard_name', 'user')->get();
+        $permissions = Permission::whereIn('guard_name', ['user', 'api'])->get();
         $userPermissions = $user->permissions;
         foreach ($permissions as $permission) {
             $permission->setAttribute('assigned', false);
