@@ -23,6 +23,7 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
+                                        <th>Image</th>
                                         <th>Name</th>
                                         <th>Category</th>
                                         <th>Year</th>
@@ -40,6 +41,11 @@
                                     @foreach ($books as $book)
                                         <tr>
                                             <td>{{ $book->id }}</td>
+                                            <td>
+                                                <img class="img-circle img-bordered-sm"
+                                                    src="{{ Storage::url($book->image) }}" alt="book image" height="70"
+                                                    width="70">
+                                            </td>
                                             <td>{{ $book->name }}</td>
                                             <td>{{ $book->category->name }}</td>
                                             <td>

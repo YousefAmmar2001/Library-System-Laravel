@@ -55,6 +55,13 @@
                                     <input type="number" class="form-control" id="quantity" placeholder="Enter quantity">
                                 </div>
                                 <div class="form-group">
+                                    <label for="book_image">Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="book_image">
+                                        <label class="custom-file-label" for="book_image">Choose file</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="custom-control custom-switch">
                                         <input type="checkbox" class="custom-control-input" id="visible" checked>
                                         <label class="custom-control-label" for="visible">Visible</label>
@@ -64,7 +71,7 @@
                             <!-- /.card-body -->
 
                             <div class="card-footer">
-                                <button type="button" onclick="createCountry()" class="btn btn-primary">Submit</button>
+                                <button type="button" onclick="createBook()" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -87,17 +94,26 @@
             theme: 'bootstrap4'
         })
 
-        function createCountry() {
-            let data = {
-                category_id: document.getElementById('category_id').value,
-                name: document.getElementById('name').value,
-                year: document.getElementById('year').value,
-                language: document.getElementById('language').value,
-                quantity: document.getElementById('quantity').value,
-                visible: document.getElementById('visible').checked
-            }
+        function createBook() {
+            // let data = {
+            //     category_id: document.getElementById('category_id').value,
+            //     name: document.getElementById('name').value,
+            //     year: document.getElementById('year').value,
+            //     language: document.getElementById('language').value,
+            //     quantity: document.getElementById('quantity').value,
+            //     visible: document.getElementById('visible').checked
+            // }
 
-            createItem('/cms/admin/books', data)
+            let formData = new FormData();
+            formData.append('category_id', document.getElementById('category_id').value);
+            formData.append('name', document.getElementById('name').value);
+            formData.append('year', document.getElementById('year').value);
+            formData.append('language', document.getElementById('language').value);
+            formData.append('quantity', document.getElementById('quantity').value);
+            formData.append('visible', document.getElementById('visible').checked);
+            formData.append('image', document.getElementById('book_image').files[0]);
+
+            createItem('/cms/admin/books', formData)
         }
     </script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class BookController extends Controller
@@ -57,8 +58,9 @@ class BookController extends Controller
             'year' => 'required|numeric|digits:4',
             'language' => 'required|string|in:en,ar',
             'quantity' => 'required|integer|min:1',
-            'visible' => 'required|boolean',
-            'image' => 'nullable|image|mimes:jpg,png|size:2048',
+            // 'visible' => 'required|boolean',
+            'visible' => 'required|in:true,false',
+            'image' => 'required|image|mimes:jpg,png|max:2048',
             'category_id' => 'required|integer|exists:categories,id'
         ]);
 
@@ -68,8 +70,13 @@ class BookController extends Controller
             $book->year = $request->get('year');
             $book->language = $request->get('language');
             $book->quantity = $request->get('quantity');
-            $book->is_visible = $request->get('visible');
-            // $book->image = $request->get('image');
+            $book->is_visible = $request->boolean('visible');
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = time() . '_' . $book->name . '.' . $image->getClientOriginalExtension();
+                $image->storePubliclyAs('books', $imageName, ['disk' => 'public']);
+                $book->image = 'books/' . $imageName;
+            }
             $book->category_id = $request->get('category_id');
             // $isSaved = Category::findOrFail($request->get('category_id'))->books()->save($book);
             $isSaved = $book->save();
@@ -118,8 +125,9 @@ class BookController extends Controller
             'year' => 'required|numeric|digits:4',
             'language' => 'required|string|in:en,ar',
             'quantity' => 'required|integer|min:1',
-            'visible' => 'required|boolean',
-            'image' => 'nullable|image|mimes:jpg,png|size:2048',
+            // 'visible' => 'required|boolean',
+            'visible' => 'required|in:true,false',
+            'image' => 'nullable|image|mimes:jpg,png|max:2048',
             'category_id' => 'required|integer|exists:categories,id'
         ]);
         if (!$validator->fails()) {
@@ -127,8 +135,14 @@ class BookController extends Controller
             $book->year = $request->get('year');
             $book->language = $request->get('language');
             $book->quantity = $request->get('quantity');
-            $book->is_visible = $request->get('visible');
-            // $book->image = $request->get('image');
+            $book->is_visible = $request->boolean('visible');
+            if ($request->hasFile('image')) {
+                Storage::disk('public')->delete($book->image);
+                $image = $request->file('image');
+                $imageName = time() . '_' . $book->name . '.' . $image->getClientOriginalExtension();
+                $image->storePubliclyAs('books', $imageName, ['disk' => 'public']);
+                $book->image = 'books/' . $imageName;
+            }
             $book->category_id = $request->get('category_id');
             $isSaved = $book->save();
             return response()->json([

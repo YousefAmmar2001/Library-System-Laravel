@@ -23,7 +23,7 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form method="POST">
+                        <form>
                             @csrf
                             <div class="card-body">
                                 <div class="form-group">
@@ -63,6 +63,13 @@
                                         placeholder="Enter quantity">
                                 </div>
                                 <div class="form-group">
+                                    <label for="book_image">Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="book_image">
+                                        <label class="custom-file-label" for="book_image">Choose file</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <div class="custom-control custom-switch">
                                         <input type="checkbox" class="custom-control-input" id="visible"
                                             @if ($book->is_visible) checked @endif>
@@ -99,15 +106,29 @@
         })
 
         function updateBook(id) {
-            let data = {
-                category_id: document.getElementById('category_id').value,
-                name: document.getElementById('name').value,
-                year: document.getElementById('year').value,
-                language: document.getElementById('language').value,
-                quantity: document.getElementById('quantity').value,
-                visible: document.getElementById('visible').checked,
+            // let data = {
+            //     category_id: document.getElementById('category_id').value,
+            //     name: document.getElementById('name').value,
+            //     year: document.getElementById('year').value,
+            //     language: document.getElementById('language').value,
+            //     quantity: document.getElementById('quantity').value,
+            //     visible: document.getElementById('visible').checked,
+            // }
+
+            let formData = new FormData();
+            formData.append('_method', 'PUT')
+            formData.append('category_id', document.getElementById('category_id').value);
+            formData.append('name', document.getElementById('name').value);
+            formData.append('year', document.getElementById('year').value);
+            formData.append('language', document.getElementById('language').value);
+            formData.append('quantity', document.getElementById('quantity').value);
+            formData.append('visible', document.getElementById('visible').checked);
+            if (document.getElementById('book_image').files[0] != undefined) {
+                formData.append('image', document.getElementById('book_image').files[0]);
             }
-            updateItem('/cms/admin/books', id, data, '/cms/admin/books')
+
+            //This will excute as update, i use '_method' => 'PUT'
+            createItem('/cms/admin/books/{{ $book->id }}', formData);
         }
     </script>
 @endsection
