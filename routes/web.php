@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPermissionController;
+use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +47,12 @@ Route::prefix('cms/admin')->middleware('auth:admin,user')->group(function () {
     Route::get('change-password', [AuthController::class, 'showChangePassword'])->name('cms.change-password');
     Route::post('change-password', [AuthController::class, 'changePassword']);
     Route::get('logout', [AuthController::class, 'logout'])->name('cms.logout');
+});
+
+Route::prefix('mail')->group(function () {
+    Route::get('welcome', function () {
+        return new WelcomeEmail();
+    });
 });
 
 Route::fallback(function () {
