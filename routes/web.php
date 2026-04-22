@@ -11,6 +11,8 @@ use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPermissionController;
 use App\Mail\WelcomeEmail;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,7 +31,7 @@ Route::prefix('cms')->middleware('guest:admin,user')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
 });
 
-Route::prefix('cms/admin')->middleware('auth:admin')->group(function () {
+Route::prefix('cms/admin')->middleware(['auth:admin', 'verified'])->group(function () {
     Route::resource('admins', AdminController::class);
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
@@ -38,7 +40,7 @@ Route::prefix('cms/admin')->middleware('auth:admin')->group(function () {
     Route::resource('permissions/user', UserPermissionController::class);
 });
 
-Route::prefix('cms/admin')->middleware('auth:admin,user')->group(function () {
+Route::prefix('cms/admin')->middleware(['auth:admin,user', 'verified'])->group(function () {
     Route::view('/', 'cms.empty')->name('home');
     Route::resource('categories', CategoryController::class);
     Route::put('books/{id}/restore', [BookController::class, 'restore'])->name('books.restore');
@@ -49,11 +51,26 @@ Route::prefix('cms/admin')->middleware('auth:admin,user')->group(function () {
     Route::get('logout', [AuthController::class, 'logout'])->name('cms.logout');
 });
 
-Route::prefix('mail')->group(function () {
-    Route::get('welcome', function () {
-        return new WelcomeEmail();
-    });
-});
+// Route::prefix('mail')->group(function () {
+//     Route::get('welcome', function () {
+//         return new WelcomeEmail();
+//     });
+// });
+
+Route::get('/email/verify', function () {
+    return view('cms.auth.verify-email');
+})->middleware('auth:admin,user')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/cms/admin');
+})->middleware(['auth:admin,user', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return response()->json(['message' => 'Verification link sent!']);
+    // return back()->with('message', 'Verification link sent!');
+})->middleware(['auth:admin,user', 'throttle:2,1'])->name('verification.send');
 
 Route::fallback(function () {
     if (auth('admin')->check() || auth('user')->check()) {

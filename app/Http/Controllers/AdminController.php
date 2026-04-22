@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Dotenv\Validator;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -61,6 +62,7 @@ class AdminController extends Controller
             $isSaved = $admin->save();
             if ($isSaved) {
                 $admin->assignRole($role);
+                event(new Registered($admin));
             }
             return response()->json([
                 'message' => $isSaved ? 'Admin saved successfully' : 'Failed to save admin'

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\WelcomeEmail;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -56,7 +57,10 @@ class UserController extends Controller
             $user->email = $request->get('email');
             $user->password = Hash::make(12345);
             $isSaved = $user->save();
-            if ($isSaved) Mail::to($user->email)->send(new WelcomeEmail());
+            if ($isSaved) {
+                Mail::to($user->email)->send(new WelcomeEmail());
+                event(new Registered($user));
+            }
             return response()->json([
                 'message' => $isSaved ? 'User saved successfully' : 'Failed to save user'
             ], $isSaved ? Response::HTTP_CREATED : Response::HTTP_BAD_REQUEST);
